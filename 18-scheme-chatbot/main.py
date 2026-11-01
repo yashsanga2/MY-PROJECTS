@@ -81,15 +81,15 @@ SCHEMES = [
 # ---------------------------------------------------------------------
 # NLP: intent matching via TF-IDF + cosine similarity (from scratch)
 # ---------------------------------------------------------------------
-def tokenize(t: str) -> list[str]:
+def tokenize(t: str) -> list:
     return re.findall(r"[a-z]+", t.lower())
 
-def build_vectors(query: str, docs: list[list[str]]):
+def build_vectors(query: str, docs: list):
     all_docs = docs + [tokenize(query)]
     vocab = sorted({w for d in all_docs for w in d})
     index = {w: i for i, w in enumerate(vocab)}
 
-    def tfidf(doc: list[str]) -> list[float]:
+    def tfidf(doc: list) -> list:
         counts = Counter(doc)
         vec = [0.0] * len(vocab)
         for word, c in counts.items():
@@ -98,7 +98,7 @@ def build_vectors(query: str, docs: list[list[str]]):
             vec[index[word]] = (c / len(doc)) * idf
         return vec
 
-    def cosine(a: list[float], b: list[float]) -> float:
+    def cosine(a: list, b: list) -> float:
         dot = sum(x * y for x, y in zip(a, b))
         na = math.sqrt(sum(x * x for x in a)) or 1
         nb = math.sqrt(sum(y * y for y in b)) or 1
@@ -133,7 +133,7 @@ def collect_profile() -> dict:
     p["rural_or_bpl"] = input("7. Rural area or BPL card? (y/n): ").strip().lower() == "y"
     return p
 
-def find_schemes(profile: dict) -> list[dict]:
+def find_schemes(profile: dict) -> list:
     matched = []
     for s in SCHEMES:
         try:
@@ -151,8 +151,9 @@ if __name__ == "__main__":
               "hospital bill help scheme",
               "how do I get pension"]:
         topic = understand_question(q)
-        print(f"🗣️ \"{q}\"  → understood topic: {topic or '(not sure)'})
-")
+        print('🗣️ "%s"  → understood topic: %s' % (q, topic or "(not sure)"))
+    print()
+
     profile = collect_profile()
     matched = find_schemes(profile)
 
@@ -161,8 +162,8 @@ if __name__ == "__main__":
         print("   No schemes matched — but check myScheme portal (myscheme.gov.in)")
         print("   which matches citizens to 3000+ central & state schemes.")
     for s in matched:
-        print(f"\n   ✅ {s['name']}")
-        print(f"      Benefit : {s['benefit']}")
-        print(f"      Documents: {s['docs']}")
-        print(f"      Apply at : {s['apply']}")
+        print("\n   ✅ %s" % s["name"])
+        print("      Benefit : %s" % s["benefit"])
+        print("      Documents: %s" % s["docs"])
+        print("      Apply at : %s" % s["apply"])
     print("\n⚠️ Rules change — always confirm on the official portal before applying.")
